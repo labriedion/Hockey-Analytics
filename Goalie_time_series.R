@@ -25,6 +25,7 @@ SVminute <- function(pbpseason) {
   return(sv)
 }
 
+#Loop over the play-by-play for every available season at Corsica Hockey http://www.corsica.hockey/data/
 sv20072008 <- SVminute("~/Downloads/pbp20072008.Rda")
 sv20082009 <- SVminute("~/Downloads/pbp20082009.Rda")
 sv20092010 <- SVminute("~/Downloads/pbp20092010.Rda")
@@ -44,14 +45,16 @@ colnames(svtotal) <- c("Minute", "2007-2008","2008-2009","2009-2010", "2010-2011
 
 svmean <- rowMeans(svtotal[,-1])
 
+#We need to split the periods otherwise the rolling average will average values from one end of a period with the start of the other
 p1 <- svmean[1:20]
 p2 <- svmean[21:40]
 p3 <- svmean[41:59]
 
-
+#Calculating the rolling average for the three periods.
 p1TMA <- SMA(p1, n=5)
 p2TMA <- SMA(p2, n=5)
 p3TMA <- SMA(p3, n=5)
 
+#Plot the time series
 any5v5 <- c(p1TMA,p2TMA,p3TMA)
 plot.ts(any5v5)
