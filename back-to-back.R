@@ -1,8 +1,9 @@
 #Back-to-back.R by Étienne Labrie-Dion
 
 #When teams are playing a back-to-back game, does the goalie save percentage vary whether they also played the night before?
-
 #Calculate goalie SV% during either 1) Their team is playing a B2B and they are too, 2) Their team is playing a B2B but they are rested, and 3) The rest of the season
+
+#This script works with Corsica Hockey's play-by-play stats: http://www.corsica.hockey/data/ and is based on Emmanuel Perry's script from Introduction to R (http://corsica.teachable.com/p/an-intro-to-r)
 
 require(dplyr)
 
