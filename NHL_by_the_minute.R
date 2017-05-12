@@ -16,7 +16,7 @@ by_minute <- function(pbpseason) {
   pbp$Seconds <- as.numeric(pbp$Seconds)
   pbp$Minute <- cut(pbp$Seconds, bins, labels = Minute)
   
-  # Remove strange strength states
+  # Remove strange strength states; you will need to export the different strength states as separate files for analysis
   pbp %>%
     filter(Strength.State %in% c("3v3", "3v4", "4v3", "3v5", "5v3", 
                                  "4v4", "4v5", "5v4", "5v5", "EvE"))->
