@@ -3,6 +3,7 @@
 
 require(dplyr)
 require(TTR)
+require(ggplot2)
 
 SVminute <- function(pbpseason) {    
   #5v5 any score
@@ -21,7 +22,6 @@ SVminute <- function(pbpseason) {
   goals <- aggregate(pbp_5$Event == "GOAL", by=list(pbp_5$Minutes), sum)
   shots <- aggregate(pbp_5$Event == "SHOT", by=list(pbp_5$Minutes), sum)
   sv =  ((shots[2]/(shots[2]+goals[2])))
-  
   return(sv)
 }
 
@@ -45,16 +45,39 @@ colnames(svtotal) <- c("Minute", "2007-2008","2008-2009","2009-2010", "2010-2011
 
 svmean <- rowMeans(svtotal[,-1])
 
+
 #We need to split the periods otherwise the rolling average will average values from one end of a period with the start of the other
+#Splitting the periods separately to perform rolling average
+
 p1 <- svmean[1:20]
 p2 <- svmean[21:40]
 p3 <- svmean[41:59]
 
 #Calculating the rolling average for the three periods.
+#Rolling average with TTR
 p1TMA <- SMA(p1, n=5)
 p2TMA <- SMA(p2, n=5)
 p3TMA <- SMA(p3, n=5)
+sma_average <- c(p1TMA,p2TMA,p3TMA)
+plot.ts(sma_average)
+
+#Another option is HoltWinters exponential smoothing 
+p1expo <- HoltWinters(p1, gamma=FALSE)
+p2expo <- HoltWinters(p2, gamma=FALSE)
+p3expo <- HoltWinters(p3, gamma=FALSE)
+exponential_average <- c(p1expo$fitted[,1], p2expo$fitted[,1], p3expo$fitted[,1])
+plot.ts(expo)
 
 #Plot the time series
 any5v5 <- c(p1TMA,p2TMA,p3TMA)
 plot.ts(any5v5)
+
+#Graphing with ggplot2
+data <- sma_average #or exponential_average
+names(data) <- c("Minute", "SV")
+ggplot(data, aes(x = Minute, y = SV)) +
+  ggtitle("Average save percentage by minute in NHL, 2007-2016")+
+  geom_line(color = 'coral1', size = 1)+
+  xlab("Minute") +
+  ylab("Save Percentage") +
+  theme(legend.position='none')
