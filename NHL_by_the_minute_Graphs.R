@@ -13,7 +13,7 @@ averages <- 5 #number of minutes included in the rolling average
 
 # Filter the dataset here:
 NHL_by_minute %>%
-  filter(Season.Type == 'Regular') -> df
+  filter(Season.Type == 'Regular' & Starter == TRUE & Finisher == TRUE) -> df
 
 # How to filter the dataset
 # Ex: (Season == '20132014' & Season.Type == 'Regular & Goalie == 'CAREY.PRICE')
