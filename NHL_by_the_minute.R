@@ -2,7 +2,8 @@
 
 #Compile shots and goals for each minute of NHL games played from 2007 to 2017 
 #for time series analysis of goalie performance
-#This script works with Corsica Hockey's play-by-play stats: http://www.corsica.hockey/data/ and is based on Emmanuel Perry's script from Introduction to R (http://corsica.teachable.com/p/an-intro-to-r)
+
+#This script uses Corsica Hockey's play-by-play stats: http://www.corsica.hockey/data/ and some parts are inspired from Emmanuel Perry's script from Introduction to R (http://corsica.teachable.com/p/an-intro-to-r)
 
 require(dplyr)
 
@@ -16,12 +17,15 @@ by_minute <- function(pbpseason) {
   pbp$Seconds <- as.numeric(pbp$Seconds)
   pbp$Minute <- cut(pbp$Seconds, bins, labels = Minute)
   
+<<<<<<< Updated upstream
   # Remove strange strength states; you will need to export the different strength states as separate files for analysis
+=======
+  # Clean up the strength states
+>>>>>>> Stashed changes
   pbp %>%
     filter(Strength.State %in% c("3v3", "3v4", "4v3", "3v5", "5v3", 
                                  "4v4", "4v5", "5v4", "5v5", "EvE"))->
     pbp_reg
-  
   
   # Compile Stats for each Minute of an NHL game
   bind_rows(pbp_reg %>%
@@ -43,12 +47,21 @@ by_minute <- function(pbpseason) {
               )
   ) %>%
     na.omit() %>%
-    group_by(Team,Season, Season.Type, Date, Game.ID, Goalie, Minute) %>%
+    group_by(Team, Season, Season.Type, Date, Game.ID, Goalie, Minute) %>%
     summarise(SA = sum(SA),
               GA = sum(GA)
     ) %>%
+    
+    # Create Starters, Finishers and MinutesPlayed columns to analyse relief goaltending
+    group_by(Team, Season, Season.Type, Date, Game.ID, Goalie) %>%
+    mutate(Minute = as.numeric(as.character(Minute)),
+           Starter = 0 %in% Minute | 1 %in% Minute  | 2 %in% Minute | 3 %in% Minute,
+           Finisher = 56 %in% Minute | 57 %in% Minute  | 58 %in% Minute | 59 %in% Minute,
+           MinutesPlayed = Minute - min(Minute)
+           #CumulSA = cumsum(SA),
+           #CumulGA = cumsum(GA)
+    ) %>%
     data.frame() -> season
- 
 }
 
 s20072008 <- by_minute("~/Downloads/pbp20072008.Rda")
@@ -62,7 +75,7 @@ s20142015 <- by_minute("~/Downloads/pbp20142015.Rda")
 s20152016 <- by_minute("~/Downloads/pbp20152016.Rda")
 s20162017 <- by_minute("~/Downloads/pbp20162017.Rda")
 
-# Compile all seasons together and save it
+# Compile all seasons together and save the result
 NHL_by_minute <- rbind(s20072008,s20082009, s20092010, s20102011, s20112012, 
                       s20122013, s20132014, s20142015, s20152016, s20162017)
 save(NHL_by_minute,file="~/Documents/NHL_by_minute.Rda")
