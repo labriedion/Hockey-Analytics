@@ -17,15 +17,12 @@ by_minute <- function(pbpseason) {
   pbp$Seconds <- as.numeric(pbp$Seconds)
   pbp$Minute <- cut(pbp$Seconds, bins, labels = Minute)
   
-<<<<<<< Updated upstream
-  # Remove strange strength states; you will need to export the different strength states as separate files for analysis
-=======
-  # Clean up the strength states
->>>>>>> Stashed changes
+  # Remove strange strength states
   pbp %>%
     filter(Strength.State %in% c("3v3", "3v4", "4v3", "3v5", "5v3", 
                                  "4v4", "4v5", "5v4", "5v5", "EvE"))->
     pbp_reg
+  
   
   # Compile Stats for each Minute of an NHL game
   bind_rows(pbp_reg %>%
@@ -34,7 +31,8 @@ by_minute <- function(pbpseason) {
               summarise(Venue = "Home",
                         TOI = sum(na.omit(as.numeric(Event.Length)))/60,
                         SA = sum(Event %in% c("GOAL", "SHOT") & ev.team == Away.Team),
-                        GA = sum(Event == "GOAL" & ev.team == Away.Team)
+                        GA = sum(Event == "GOAL" & ev.team == Away.Team),
+                        Score = max(as.numeric(Home.Score)) - max(as.numeric(Away.Score))
               ),
             
             pbp_reg %>%
@@ -43,16 +41,18 @@ by_minute <- function(pbpseason) {
               summarise(Venue = "Away",
                         TOI = sum(na.omit(as.numeric(Event.Length)))/60,
                         SA = sum(Event %in% c("GOAL", "SHOT") & ev.team == Home.Team),
-                        GA = sum(Event == "GOAL" & ev.team == Home.Team)
+                        GA = sum(Event == "GOAL" & ev.team == Home.Team),
+                        Score = max(as.numeric(Away.Score)) - max(as.numeric(Home.Score))
               )
   ) %>%
     na.omit() %>%
     group_by(Team, Season, Season.Type, Date, Game.ID, Goalie, Minute) %>%
     summarise(SA = sum(SA),
-              GA = sum(GA)
+              GA = sum(GA),
+              Score = Score
     ) %>%
     
-    # Create Starters, Finishers and MinutesPlayed columns to analyse relief goaltending
+    # Create Starters, Finishers and Minutes Played columns to analyse relief goaltending
     group_by(Team, Season, Season.Type, Date, Game.ID, Goalie) %>%
     mutate(Minute = as.numeric(as.character(Minute)),
            Starter = 0 %in% Minute | 1 %in% Minute  | 2 %in% Minute | 3 %in% Minute,
@@ -62,6 +62,7 @@ by_minute <- function(pbpseason) {
            #CumulGA = cumsum(GA)
     ) %>%
     data.frame() -> season
+ 
 }
 
 s20072008 <- by_minute("~/Downloads/pbp20072008.Rda")
