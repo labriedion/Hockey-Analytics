@@ -113,12 +113,14 @@ sv20122013 <- B2B_calc("~/Downloads/pbp20122013.Rda")
 sv20132014 <- B2B_calc("~/Downloads/pbp20132014.Rda")
 sv20142015 <- B2B_calc("~/Downloads/pbp20142015.Rda")
 sv20152016 <- B2B_calc("~/Downloads/pbp20152016.Rda")
+sv20162017 <- B2B_calc("~/Downloads/pbp20162017.Rda")
 
 
-B2Btotalteam <- cbind(sv20072008[,5],sv20082009[,5], sv20092010[,5], 
-                  sv20102011[,5],sv20112012[,5], sv20122013[,5], sv20132014[,5],sv20142015[,5],sv20152016[,5])
+B2Btotalteam <- cbind(sv20072008[,5],sv20082009[,5], sv20092010[,5], sv20102011[,5],
+                      sv20112012[,5], sv20122013[,5], sv20132014[,5],sv20142015[,5],
+                      sv20152016[,5], sv20162017[,5])
 colnames(B2Btotalteam) <- c("2007-2008","2008-2009","2009-2010", "2010-2011", "2011-2012", 
-                         "2012-2013", "2013-2014", "2014-2015", "2015-2016")
+                         "2012-2013", "2013-2014", "2014-2015", "2015-2016", "2016-2017")
 rownames(B2Btotalteam) <- c("Team B2B - Goalie Tired", "Team B2B - Goalie Rested", "Normal Game")
 
-#plot(B2Btotalteam)
+plot(B2Btotalteam)
